@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">پر فیچر</string>
+    <string name="activate_alarm">فعالسازی هشدار</string>
+    <string name="alarm_activated">هشدار فعال است</string>
+</resources>
