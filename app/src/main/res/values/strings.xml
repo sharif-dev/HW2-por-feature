@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">پر فیچر</string>
     <string name="activate_alarm">فعالسازی هشدار</string>
-    <string name="alarm_activated">هشدار فعال است</string>
+    <string name="alarm_activated">هشدار فعال باشد؟</string>
+    <string name="turn_to_deactivate">برای غیر فعال کردن گوشی را بچرخانید</string>
+    <string name="min_z_speed_text_hint">حداقل سرعت زاویه‌ای برای غیر فعال کردن آلارم</string>
+    <string name="min_z_speed">min_z_speed</string>
 </resources>

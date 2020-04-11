@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TimePicker;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -77,8 +78,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void scheduleAlarm(Calendar calendar) {
+        EditText minZ = findViewById(R.id.edit_text_min_z_speed);
+        float minZSpeed;
+        try {
+            minZSpeed = Float.parseFloat(minZ.getText().toString());
+        } catch (NumberFormatException e) {
+            minZSpeed = 0.2f;
+        }
+
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+        intent.putExtra(getString(R.string.min_z_speed), minZSpeed);
         alarmPendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0,
                 intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
