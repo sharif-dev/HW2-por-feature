@@ -1,8 +1,14 @@
 package com.example.porfeature;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -15,24 +21,80 @@ import android.widget.TimePicker;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     PendingIntent alarmPendingIntent;
     AlarmManager alarmManager;
+    private static DevicePolicyManager mgr;
+    private static ComponentName cn;
+    private static SensorManager mSensorManager;
+    private static Sensor mAccelerometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = Objects.requireNonNull(mSensorManager).getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         setListeners();
-
         TimePicker timePicker = findViewById(R.id.alarm_time_picker);
         timePicker.setIs24HourView(true);
+    }
+
+    public static Sensor getAccelerometer(){
+        return mAccelerometer;
+    }
+
+    public static SensorManager getSensor(){
+        return mSensorManager;
+    }
+
+    public static DevicePolicyManager getMgr(){
+        return mgr;
+    }
+
+    public static ComponentName getCn(){
+        return cn;
     }
 
     private void setListeners() {
         setAlarmCheckBoxListener();
         setAlarmButtonListener();
+        setLockCheckBoxListener();
+    }
+
+    private void setLockCheckBoxListener() {
+        CheckBox lockCheckBox = findViewById(R.id.set_unlock);
+        lockCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    onSetLockFeature();
+                } else {
+                    cancelLockFeature();
+                }
+            }
+        });
+    }
+
+    private void cancelLockFeature() {
+        Intent intent = new Intent(MainActivity.this, SmartLockService.class);
+        stopService(intent);
+    }
+
+    private void onSetLockFeature() {
+        mgr = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
+        cn = new ComponentName(this, Admin.class);
+        Intent intent_2 = new Intent(MainActivity.this, SmartLockService.class);
+        if (mgr.isAdminActive(cn))
+            startService(intent_2);
+        else{
+            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cn);
+        intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                R.string.device_admin_explanation);
+        startActivityForResult(intent, 0);}
     }
 
     private void setAlarmCheckBoxListener() {
