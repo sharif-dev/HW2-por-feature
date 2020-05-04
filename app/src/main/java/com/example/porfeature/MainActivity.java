@@ -28,27 +28,17 @@ public class MainActivity extends AppCompatActivity {
     AlarmManager alarmManager;
     private static DevicePolicyManager mgr;
     private static ComponentName cn;
-    private static SensorManager mSensorManager;
-    private static Sensor mAccelerometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = Objects.requireNonNull(mSensorManager).getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
         setListeners();
         TimePicker timePicker = findViewById(R.id.alarm_time_picker);
         timePicker.setIs24HourView(true);
     }
 
-    public static Sensor getAccelerometer(){
-        return mAccelerometer;
-    }
-
-    public static SensorManager getSensor(){
-        return mSensorManager;
-    }
 
     public static DevicePolicyManager getMgr(){
         return mgr;
@@ -84,9 +74,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onSetLockFeature() {
+        EditText degree = findViewById(R.id.lock_degree);
+        int minDegree;
+        try {
+            minDegree = Integer.parseInt(degree.getText().toString());
+        } catch (NumberFormatException e) {
+            minDegree = 25; }
+
         mgr = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
         cn = new ComponentName(this, Admin.class);
         Intent intent_2 = new Intent(MainActivity.this, SmartLockService.class);
+        intent_2.putExtra("degree", minDegree);
         if (mgr.isAdminActive(cn))
             startService(intent_2);
         else{

@@ -4,7 +4,9 @@
     <string name="alarm_activated">هشدار فعال باشد؟</string>
     <string name="turn_to_deactivate">برای غیر فعال کردن گوشی را بچرخانید</string>
     <string name="min_z_speed_text_hint">حداقل سرعت زاویه‌ای برای غیر فعال کردن آلارم</string>
+    <string name="lock_degree">حد زاویه ای برای قفل شدن</string>
     <string name="min_z_speed">min_z_speed</string>
+    <string name="degree">degree</string>
     <string name="lock_phone">قفل هوشمند</string>
     <string name="device_admin_explanation">Admin</string>
 </resources>
