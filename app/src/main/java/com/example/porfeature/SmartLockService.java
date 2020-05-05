@@ -10,9 +10,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+
 
 
 public class SmartLockService extends Service implements SensorEventListener {
@@ -21,7 +21,7 @@ public class SmartLockService extends Service implements SensorEventListener {
     private DevicePolicyManager mgr;
     private SensorManager sensorManager;
     float[] g = new float[3];
-    private int inclination;
+    private int minDegree;
 
 
     public SmartLockService() {
@@ -39,22 +39,12 @@ public class SmartLockService extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        int minDegree = intent.getIntExtra("degree", 25);
+        minDegree = intent.getIntExtra("degree", 25);
         Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.unregisterListener(this);
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-        if (inclination < minDegree || inclination > 180 - minDegree){
-            if (mgr.isAdminActive(cn))
-                mgr.lockNow();
-            else
-                Toast.makeText(getApplicationContext(),"no admin",
-                    Toast.LENGTH_SHORT).show();}
-        else
-            Toast.makeText(getApplicationContext(),"not on surface",
-                    Toast.LENGTH_SHORT).show();
-
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         return super.onStartCommand(intent, flags, startId);
     }
+
 
     @Override
     public void onDestroy() {
@@ -70,6 +60,7 @@ public class SmartLockService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+
         g = event.values.clone();
         double norm_Of_g = Math.sqrt(g[0] * g[0] + g[1] * g[1] + g[2] * g[2]);
 
@@ -77,7 +68,13 @@ public class SmartLockService extends Service implements SensorEventListener {
         g[1] = (float) (g[1] / norm_Of_g);
         g[2] = (float) (g[2] / norm_Of_g);
 
-        inclination = (int) Math.round(Math.toDegrees(Math.acos(g[2])));
+        int inclination = (int) Math.round(Math.toDegrees(Math.acos(g[2])));
+
+
+        if (inclination < minDegree || inclination > 180 - minDegree)
+            if (mgr.isAdminActive(cn)) {
+                mgr.lockNow();
+            }
     }
 
     @Override
